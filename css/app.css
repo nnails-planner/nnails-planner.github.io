@@ -332,6 +332,23 @@ body[data-tab="cal"] .view { padding-bottom: calc(var(--tabs-h) + var(--safe-b) 
 
 /* ── кътче ── */
 .corner .seg3 button { font-size: 13.5px; }
+.seg-corner { border-radius: 18px; }
+.seg-corner button { flex-direction: column; gap: 2px; border-radius: 14px; min-height: 52px; padding: 5px 0; font-size: 12.5px; }
+.seg-corner button .ic { width: 18px; height: 18px; }
+
+/* ── сънища ── */
+.dream { display: flex; gap: 14px; text-align: left; padding: 14px; align-items: flex-start; }
+.dream-date { flex: none; width: 48px; padding: 7px 0 6px; border-radius: 14px; background: linear-gradient(160deg, #3E2F25, #1E1611); color: #E6C985; display: flex; flex-direction: column; align-items: center; line-height: 1; }
+.dream-date b { font: 400 22px/1 var(--display); }
+.dream-date small { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; margin-top: 3px; color: #D4B574; }
+.dream-body { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.dream-body b { font: 400 19px/1.25 var(--display); }
+.dream-body em { font: italic 300 15px/1.4 var(--display); color: var(--ink-2); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; white-space: pre-line; }
+.dream-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; font-size: 13px; color: var(--ink-2); margin-top: 2px; }
+.dream-meta .tag { font-size: 12px; padding: 3px 9px; }
+.dream-emo { letter-spacing: .1em; font-size: 15px; }
+.dream-tip { display: flex; gap: 12px; align-items: flex-start; color: var(--ink-2); font-size: 15px; line-height: 1.5; }
+.dream-tip .ic { flex: none; width: 22px; height: 22px; color: var(--gold-ink); margin-top: 2px; }
 .filter { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; }
 .filter button { padding: 7px 14px; border-radius: 999px; font-size: 14px; border: 1px solid var(--vein); background: var(--white); color: var(--ink-2); white-space: nowrap; }
 .filter button.on { background: var(--ink); color: var(--paper); border-color: var(--ink); }

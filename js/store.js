@@ -13,6 +13,7 @@ export function defaults() {
     books: [],
     trips: [],
     lists: [],
+    dreams: [],
     salon: { lastVisit: '', intervalWeeks: 4, dueHidden: '' },
     prefs: { holidays: true },
   };

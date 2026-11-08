@@ -4,6 +4,7 @@ import { state, ui, esc, commit, openSheet, closeSheet, registerActions, formDat
 import { uid } from '../store.js';
 import { icon } from '../icons.js';
 import * as Photos from '../photos.js';
+import { dreamsPage } from './dreams.js';
 
 const BOOK_STATUS = { want: 'Искам да я прочета', reading: 'Чета я', read: 'Прочетена' };
 const TRIP_STATUS = { dream: 'Мечта', planned: 'Планирам', visited: 'Посетено ✓' };
@@ -219,12 +220,13 @@ function listForm(l) {
 
 export function render() {
   const tab = ui.corner || 'books';
-  const body = tab === 'trips' ? trips() : tab === 'gifts' ? gifts() : books();
+  const body = tab === 'trips' ? trips() : tab === 'gifts' ? gifts() : tab === 'dreams' ? dreamsPage() : books();
   return `<div class="page corner">
-    <div class="seg seg3 sticky-seg">
+    <div class="seg seg-corner sticky-seg">
       <button class="${tab === 'books' ? 'on' : ''}" data-act="corner" data-t="books">${icon('book')} Книги</button>
       <button class="${tab === 'trips' ? 'on' : ''}" data-act="corner" data-t="trips">${icon('suitcase')} Пътувания</button>
       <button class="${tab === 'gifts' ? 'on' : ''}" data-act="corner" data-t="gifts">${icon('gift')} Подаръци</button>
+      <button class="${tab === 'dreams' ? 'on' : ''}" data-act="corner" data-t="dreams">${icon('moon')} Сънища</button>
     </div>
     ${body}
   </div>`;
