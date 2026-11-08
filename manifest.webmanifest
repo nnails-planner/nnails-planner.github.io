@@ -1,0 +1,18 @@
+{
+  "name": "N NAILS Planner",
+  "short_name": "N Planner",
+  "description": "Твоят личен планер от N NAILS: календар, цикъл, цели, книги, пътувания и подаръци.",
+  "lang": "bg",
+  "id": "./",
+  "start_url": "./?source=pwa",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#F2ECE3",
+  "theme_color": "#F2ECE3",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "icons/maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
