@@ -28,17 +28,6 @@ const FILTERS = [
   ['repeat', '🔁 Повтарящи се'],
 ];
 
-// Кой ден от цикъла е бил — за да личи дали сънищата се менят с цикъла.
-function cycleDayOf(date) {
-  const starts = (state.cycle.periods || [])
-    .map((p) => p.start)
-    .filter((s) => D.isValid(s) && s <= date)
-    .sort();
-  if (!starts.length) return 0;
-  const n = D.diffDays(starts[starts.length - 1], date) + 1;
-  return n >= 1 && n <= 45 ? n : 0;
-}
-
 function headline(d) {
   if (d.title) return d.title;
   const first = (d.text || '').split('\n')[0].trim();
@@ -51,8 +40,6 @@ function dreamCard(d) {
   const emo = (d.kinds || []).map((k) => KIND_EMO[k]).filter(Boolean).join(' ');
   if (emo) meta.push(`<span class="dream-emo">${emo}</span>`);
   if (d.sleep) meta.push(`<span class="tag">${SLEEP_TEXT[d.sleep]}</span>`);
-  const cd = cycleDayOf(d.date);
-  if (cd) meta.push(`<span class="tag tag-period">ден ${cd} от цикъла</span>`);
   const showText = d.title && d.text;
   return `<button class="card dream" data-act="dream-edit" data-id="${d.id}">
     <span class="dream-date"><b>${D.dayNum(d.date)}</b><small>${D.MONTHS_SHORT[D.monthIdx(d.date)]}</small></span>
@@ -78,7 +65,7 @@ export function dreamsPage() {
         ? list.map(dreamCard).join('')
         : all.length
           ? `<p class="empty card">Тук още няма такива сънища.</p>`
-          : `<div class="card dream-tip">${icon('moon')}<p>Запиши съня веднага щом се събудиш, защото сънищата се забравят за минути. С времето ще виждаш кои се повтарят и как спиш в различните дни от цикъла.</p></div>`
+          : `<div class="card dream-tip">${icon('moon')}<p>Казват, че сънят от четвъртък срещу петък се сбъдва, а лошият сън се разказва на течаща вода, за да отплува надалеч. Сънищата са малки приказки, които душата ти разказва нощем. Запиши своята веднага щом станеш. С времето ще откриеш кои приказки се повтарят.</p></div>`
     }</div>
     <button class="btn primary wide" data-act="dream-new">${icon('plus')} Запиши сън</button>`;
 }

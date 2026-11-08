@@ -1,6 +1,6 @@
 // Офлайн режим: всичко нужно се пази в телефона след първото отваряне.
 // При всяка промяна на файловете смени VERSION, за да получат клиентките новата версия.
-const VERSION = 'nnp-1.0.3';
+const VERSION = 'nnp-1.0.4';
 const FONTS = 'nnp-fonts';
 const DEV = ['localhost', '127.0.0.1'].includes(self.location.hostname);
 const SHELL = [
