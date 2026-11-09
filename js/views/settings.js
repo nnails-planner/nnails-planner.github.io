@@ -5,6 +5,7 @@ import { defaults, normalize } from '../store.js';
 import { icon } from '../icons.js';
 import * as Photos from '../photos.js';
 import { APP_VERSION } from '../config.js';
+import { fastMode } from './fasts.js';
 
 let installEvent = null;
 window.addEventListener('beforeinstallprompt', (e) => {
@@ -63,6 +64,10 @@ function settingsBody() {
   return `<div class="form">
     <label class="field"><span>Твоето име</span><input name="name" value="${esc(state.profile.name)}" maxlength="40" data-change="set-name"></label>
     <label class="switch"><input type="checkbox" ${state.prefs.holidays ? 'checked' : ''} data-change="set-holidays"><span></span>Празници и имени дни в календара</label>
+    <div class="field"><span>Пости в календара</span>
+      <div class="seg seg-fasts">${[['day', 'Всеки ден'], ['big', 'Само големите'], ['off', 'Без пости']].map(([v, l]) => `<button type="button" class="${fastMode() === v ? 'on' : ''}" data-act="set-fasts" data-v="${v}">${l}</button>`).join('')}</div>
+      <small class="muted">„Всеки ден“ показва какво се яде днес — по календара на Българската православна църква. „Само големите“ показва само четирите големи пости.</small>
+    </div>
     <button class="btn ghost wide" data-act="install-open">${icon('addsq')} Сложи планера на началния екран</button>
     <section class="set-block">
       <h3>Резервно копие</h3>
@@ -144,6 +149,11 @@ registerActions({
   },
   'set-holidays': (el) => {
     state.prefs.holidays = el.checked;
+    commit();
+  },
+  'set-fasts': (el) => {
+    state.prefs.fasts = el.dataset.v;
+    el.parentElement.querySelectorAll('button').forEach((b) => b.classList.toggle('on', b === el));
     commit();
   },
   'backup-export': () => exportBackup().catch(() => toast('Копието не можа да се запази.')),

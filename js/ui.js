@@ -56,7 +56,9 @@ export function toast(msg) {
   el.innerHTML = msg;
   el.classList.add('show');
   clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => el.classList.remove('show'), 2800);
+  // по-дългите съобщения стоят по-дълго, за да се прочетат
+  const ms = Math.max(2800, Math.min(7000, el.textContent.length * 55));
+  toastTimer = setTimeout(() => el.classList.remove('show'), ms);
 }
 
 // ── лист отдолу ──

@@ -1,6 +1,6 @@
 // Офлайн режим: всичко нужно се пази в телефона след първото отваряне.
 // При всяка промяна на файловете смени VERSION, за да получат клиентките новата версия.
-const VERSION = 'nnp-1.0.5';
+const VERSION = 'nnp-1.0.6';
 const FONTS = 'nnp-fonts';
 const DEV = ['localhost', '127.0.0.1'].includes(self.location.hostname);
 const SHELL = [
@@ -13,6 +13,7 @@ const SHELL = [
   'js/store.js',
   'js/dates.js',
   'js/holidays.js',
+  'js/fasting.js',
   'js/icons.js',
   'js/photos.js',
   'js/config.js',
@@ -24,6 +25,7 @@ const SHELL = [
   'js/views/salon.js',
   'js/views/settings.js',
   'js/views/dreams.js',
+  'js/views/fasts.js',
   'img/hero.webp',
   'img/q1-winter.webp',
   'img/q2-spring.webp',
@@ -45,7 +47,8 @@ const SHELL = [
 ];
 
 self.addEventListener('install', (e) => {
-  e.waitUntil(caches.open(VERSION).then((c) => c.addAll(SHELL)));
+  // cache: 'reload' — винаги от сървъра, а не стар файл от паметта на браузъра
+  e.waitUntil(caches.open(VERSION).then((c) => c.addAll(SHELL.map((u) => new Request(u, { cache: 'reload' })))));
 });
 
 self.addEventListener('activate', (e) => {

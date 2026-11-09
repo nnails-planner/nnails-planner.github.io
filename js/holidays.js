@@ -58,6 +58,7 @@ function buildYear(y) {
     if (v.n) add(date, null, v.n);
   }
   const e = orthodoxEaster(y);
+  add(addDays(e, -49), ['Сирни заговезни (Прошка)', 0]);
   add(addDays(e, -43), ['Тодоровден', 0], 'Тодор, Теодора, Тодорка');
   add(addDays(e, -8), ['Лазаровден', 0], 'Лазар');
   add(addDays(e, -7), ['Цветница', 0], 'Цвета, Цветелина, Цветан, Лиляна, Роза, Виолета, Маргарита');

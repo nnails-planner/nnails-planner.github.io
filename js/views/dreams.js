@@ -74,7 +74,9 @@ function dreamForm(d) {
   return `<form class="form" data-form="dream" onsubmit="return false">
     <label class="field"><span>Дата</span><input type="date" name="date" value="${d.date || D.today()}"></label>
     <label class="field"><span>Заглавие (по желание)</span><input name="title" value="${esc(d.title || '')}" maxlength="80" placeholder="напр. Летях над морето" autocomplete="off"></label>
-    <label class="field"><span>Какво сънувах</span><textarea name="text" rows="6" maxlength="4000" placeholder="Хора, места, цветове, какво почувства…">${esc(d.text || '')}</textarea></label>
+    <div class="field"><div class="field-head"><label for="dream-text">Какво сънувах</label>${
+      canDictate() ? `<button type="button" class="mic-btn" data-act="dream-mic">${icon('mic')}<span>Диктувай</span></button>` : ''
+    }</div><textarea id="dream-text" name="text" rows="6" maxlength="4000" placeholder="Хора, места, цветове, какво почувства…">${esc(d.text || '')}</textarea></div>
     <div class="field"><span>Какъв беше сънят</span>${chips('kinds', DREAM_KINDS, d.kinds || [], { multi: true })}</div>
     <div class="field"><span>Как спах</span>${chips('sleep', SLEEP, d.sleep || '')}</div>
     <button class="btn primary wide" data-act="dream-save" data-id="${d.id || ''}">Запази</button>
@@ -83,7 +85,97 @@ function dreamForm(d) {
 }
 
 export function openDream(d) {
-  openSheet({ title: d.id ? 'Сън' : `${D.fmtShort(d.date || D.today())} · Нов сън`, body: dreamForm(d) });
+  openSheet({ title: d.id ? 'Сън' : `${D.fmtShort(d.date || D.today())} · Нов сън`, body: dreamForm(d), onClose: stopDictation });
+}
+
+// ── диктуване ──
+// Работи там, където браузърът разпознава български (Chrome на Android).
+// На iPhone Apple не го позволява в приложения от началния екран, затова там бутонът не се показва.
+const SR = () => window.SpeechRecognition || window.webkitSpeechRecognition;
+const isApple = () => /Apple/.test(navigator.vendor || '') || /iPad|iPhone|iPod/.test(navigator.userAgent);
+export const canDictate = () => !!SR() && !isApple();
+
+let rec = null;
+const MIC_ERRORS = {
+  'not-allowed': 'Планерът няма достъп до микрофона. Разреши го, когато телефонът те попита, или от настройките на браузъра.',
+  'service-not-allowed': 'На този телефон диктуването не е разрешено. Можеш да пишеш с клавиатурата.',
+  'language-not-supported': 'Този телефон не може да диктува на български. Можеш да пишеш с клавиатурата.',
+  'no-speech': 'Не те чух. Натисни „Диктувай“ и опитай пак.',
+  'audio-capture': 'Не намирам микрофон на телефона.',
+  network: 'За диктуване трябва интернет.',
+};
+
+function micUi(on) {
+  const root = sheetRoot();
+  const btn = root && root.querySelector('.mic-btn');
+  if (btn) {
+    btn.classList.toggle('on', on);
+    btn.innerHTML = on ? `<i class="mic-dot"></i><span>Слушам… Спри</span>` : `${icon('mic')}<span>Диктувай</span>`;
+  }
+  root?.querySelector('[name=text]')?.classList.toggle('listening', on);
+}
+
+function stopDictation() {
+  const r = rec;
+  rec = null;
+  if (r) {
+    try {
+      r.abort();
+    } catch (e) {}
+  }
+  micUi(false);
+}
+
+// Някои телефони повтарят вече казаното в следващия резултат („летях“, „летях над морето“).
+function addPart(list, t) {
+  const last = list[list.length - 1];
+  if (last && t.toLowerCase().startsWith(last.toLowerCase())) list[list.length - 1] = t;
+  else list.push(t);
+}
+
+function startDictation() {
+  const Rec = SR();
+  const ta = sheetRoot()?.querySelector('[data-form=dream] [name=text]');
+  if (!Rec || !ta) return;
+  const r = new Rec();
+  r.lang = 'bg-BG';
+  r.continuous = true;
+  r.interimResults = true;
+  const before = ta.value.replace(/\s+$/, '');
+  const capital = !before || /[.!?…]$/.test(before);
+  r.onresult = (e) => {
+    if (rec !== r) return;
+    const parts = [];
+    let interim = '';
+    for (const res of e.results) {
+      const t = res[0].transcript.trim();
+      if (!t) continue;
+      if (res.isFinal) addPart(parts, t);
+      else interim = t;
+    }
+    if (interim) addPart(parts, interim);
+    let said = parts.join(' ');
+    if (capital) said = said.charAt(0).toUpperCase() + said.slice(1);
+    ta.value = ((before ? before + ' ' : '') + said).slice(0, 4000);
+    ta.scrollTop = ta.scrollHeight;
+  };
+  r.onerror = (e) => {
+    if (rec !== r) return;
+    if (MIC_ERRORS[e.error]) toast(MIC_ERRORS[e.error]);
+  };
+  r.onend = () => {
+    if (rec !== r) return;
+    rec = null;
+    micUi(false);
+  };
+  try {
+    r.start();
+  } catch (e) {
+    toast('Диктуването не тръгна. Опитай пак.');
+    return;
+  }
+  rec = r;
+  micUi(true);
 }
 
 registerActions({
@@ -92,12 +184,14 @@ registerActions({
     saveUi();
     commit();
   },
+  'dream-mic': () => (rec ? rec.stop() : startDictation()),
   'dream-new': (el) => openDream({ date: el.dataset.date || D.today(), kinds: [] }),
   'dream-edit': (el) => {
     const d = state.dreams.find((x) => x.id === el.dataset.id);
     if (d) openDream(d);
   },
   'dream-save': (el) => {
+    stopDictation();
     const f = formData(sheetRoot().querySelector('[data-form=dream]'));
     const data = {
       date: D.isValid(f.date) ? f.date : D.today(),

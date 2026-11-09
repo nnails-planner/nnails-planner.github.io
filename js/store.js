@@ -15,7 +15,7 @@ export function defaults() {
     lists: [],
     dreams: [],
     salon: { lastVisit: '', intervalWeeks: 4, dueHidden: '' },
-    prefs: { holidays: true },
+    prefs: { holidays: true, fasts: 'day' },
   };
 }
 
