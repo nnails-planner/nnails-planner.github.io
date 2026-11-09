@@ -12,11 +12,11 @@ const savedUi = (() => {
     return {};
   }
 })();
-export const ui = Object.assign({ tab: 'cal', calMode: 'month', corner: 'books', bookFilter: 'all' }, savedUi);
+export const ui = Object.assign({ tab: 'cal', calMode: 'month', corner: 'books', bookFilter: 'all', kitchen: 'book' }, savedUi);
 export function saveUi() {
   try {
-    const { tab, calMode, corner, bookFilter } = ui;
-    localStorage.setItem(UI_KEY, JSON.stringify({ tab, calMode, corner, bookFilter }));
+    const { tab, calMode, corner, bookFilter, kitchen } = ui;
+    localStorage.setItem(UI_KEY, JSON.stringify({ tab, calMode, corner, bookFilter, kitchen }));
   } catch {}
 }
 
@@ -63,7 +63,7 @@ export function toast(msg) {
 
 // ── лист отдолу ──
 let current = null;
-export function openSheet({ title = '', body = '', render = null, onMount = null, onClose = null, cls = '' }) {
+export function openSheet({ title = '', body = '', render = null, onMount = null, onClose = null, onRefresh = null, cls = '' }) {
   const root = document.getElementById('sheet-root');
   if (current) {
     const prev = current;
@@ -83,7 +83,7 @@ export function openSheet({ title = '', body = '', render = null, onMount = null
   root.appendChild(wrap);
   document.body.classList.add('sheet-open');
   requestAnimationFrame(() => requestAnimationFrame(() => wrap.classList.add('in')));
-  current = { el: wrap, render, onClose };
+  current = { el: wrap, render, onClose, onRefresh };
   if (onMount) onMount(wrap);
   return wrap;
 }
@@ -108,6 +108,7 @@ export function refreshSheet() {
     if (keep[i.name] != null) i.value = keep[i.name];
   });
   body.scrollTop = top;
+  if (current.onRefresh) current.onRefresh(current.el);
 }
 export const sheetRoot = () => current && current.el;
 

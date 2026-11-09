@@ -2,6 +2,7 @@
 import * as D from '../dates.js';
 import { dayMarks } from '../holidays.js';
 import * as Fasts from './fasts.js';
+import * as Kitchen from './kitchen.js';
 import { cycleModel, dayStatus } from '../cycle-model.js';
 import { state, ui, esc, commit, openSheet, closeSheet, registerActions, formData, sheetRoot, toast, confirmSheet, chips, saveUi, deliverFile, isIOS, isStandalone } from '../ui.js';
 import { uid } from '../store.js';
@@ -103,7 +104,8 @@ function cell(date, monthKey, m, opts = {}) {
   const dots = opts.noEvents ? '' : ev.slice(0, 3).map((e) => `<i style="background:${(CATS[e.cat] || CATS.personal).color}"></i>`).join('');
   const holi = marks && marks.h.length ? '<em class="holi"></em>' : '';
   const fast = opts.noEvents ? '' : Fasts.gridMark(date);
-  return `<button class="${cls}" data-act="${opts.act || 'pick-day'}" data-date="${date}" aria-label="${D.fmtLong(date)}">${holi}<span>${D.dayNum(date)}</span><span class="dots">${dots}</span>${fast}</button>`;
+  const kmark = opts.noEvents ? '' : Kitchen.gridMark(date);
+  return `<button class="${cls}" data-act="${opts.act || 'pick-day'}" data-date="${date}" aria-label="${D.fmtLong(date)}">${holi}${kmark}<span>${D.dayNum(date)}</span><span class="dots">${dots}</span>${fast}</button>`;
 }
 
 export function monthGridHtml(monthKey, opts = {}) {
@@ -120,6 +122,7 @@ function dayLine(date, opts = {}) {
     marks.h.forEach((h) => parts.push(`<span class="tag ${h.off ? 'tag-gold' : ''}">${esc(h.name)}${h.off ? ' · почивен ден' : ''}</span>`));
   }
   parts.push(...Fasts.dayTags(date, { withLevel: opts.week }));
+  if (opts.week) parts.push(...Kitchen.weekTags(date));
   const m = cycleModel(state.cycle);
   const st = dayStatus(m, date);
   const stText = { period: 'Цикъл', predicted: 'Очакван цикъл', ovulation: 'Овулация (прогноза)', fertile: 'Плодни дни (прогноза)' }[st];
@@ -148,6 +151,7 @@ function dayPanel(date) {
   return `<section class="card day-panel">
     <header class="panel-head"><div><p class="caps">${D.relDays(D.diffDays(D.today(), date)).replace(/^./, (c) => c.toUpperCase())}</p><h3>${D.fmtLong(date)}</h3></div></header>
     ${Fasts.card(date)}
+    ${Kitchen.dayBlock(date)}
     ${dayLine(date)}
     <div class="evs">${ev.length ? ev.map(eventRow).join('') : `<p class="empty">Свободен ден. Добави среща, задача или нещо хубаво за себе си.</p>`}</div>
   </section>`;
@@ -197,7 +201,7 @@ export function render() {
           <h2>${D.monthTitle(ui.calMonth)}</h2>
           <button class="icon-btn" data-act="month-shift" data-n="1" aria-label="Следващ месец">${icon('right')}</button></div>
         ${monthGridHtml(ui.calMonth)}
-        <div class="legend"><span><i class="lg-ev"></i>ангажимент</span><span><i class="lg-period"></i>цикъл</span><span><i class="lg-pred"></i>очакван</span><span><i class="lg-fert"></i>плодни дни</span>${Fasts.legend(ui.calMonth)}</div>
+        <div class="legend"><span><i class="lg-ev"></i>ангажимент</span><span><i class="lg-period"></i>цикъл</span><span><i class="lg-pred"></i>очакван</span><span><i class="lg-fert"></i>плодни дни</span>${Fasts.legend(ui.calMonth)}${Kitchen.monthHasKitchen(ui.calMonth) ? '<span><i class="lg-k"></i>готвя</span>' : ''}</div>
         ${ui.calMonth !== D.monthKey(t) || ui.sel !== t ? `<button class="link-btn" data-act="go-today">Към днес</button>` : ''}
       </section>
       ${dayPanel(ui.sel)}`

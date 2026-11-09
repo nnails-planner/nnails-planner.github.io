@@ -1,6 +1,6 @@
 // Офлайн режим: всичко нужно се пази в телефона след първото отваряне.
 // При всяка промяна на файловете смени VERSION, за да получат клиентките новата версия.
-const VERSION = 'nnp-1.0.6';
+const VERSION = 'nnp-1.0.7';
 const FONTS = 'nnp-fonts';
 const DEV = ['localhost', '127.0.0.1'].includes(self.location.hostname);
 const SHELL = [
@@ -14,6 +14,7 @@ const SHELL = [
   'js/dates.js',
   'js/holidays.js',
   'js/fasting.js',
+  'js/kitchen-model.js',
   'js/icons.js',
   'js/photos.js',
   'js/config.js',
@@ -26,6 +27,8 @@ const SHELL = [
   'js/views/settings.js',
   'js/views/dreams.js',
   'js/views/fasts.js',
+  'js/views/kitchen.js',
+  'js/views/recipe.js',
   'img/hero.webp',
   'img/q1-winter.webp',
   'img/q2-spring.webp',
@@ -36,6 +39,7 @@ const SHELL = [
   'img/travel.webp',
   'img/gifts.webp',
   'img/dreams.svg',
+  'img/kitchen.svg',
   'img/salon.webp',
   'img/nnails-logo.webp',
   'img/nanokti-logo.webp',

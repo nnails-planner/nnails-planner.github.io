@@ -77,7 +77,7 @@ function settingsBody() {
     </section>
     <section class="set-block">
       <h3>${icon('lock')} Поверителност</h3>
-      <p class="muted small">Планерът няма регистрация. Всичко, което записваш — ангажименти, цикъл, цели, снимки — стои само в паметта на телефона ти. Нито ние, нито някой друг го вижда.</p>
+      <p class="muted small">Планерът няма регистрация. Всичко, което записваш — ангажименти, цикъл, цели, рецепти, снимки — стои само в паметта на телефона ти. Нито ние, нито някой друг го вижда.</p>
     </section>
     <button class="btn ghost danger-text wide" data-act="wipe">${icon('trash')} Изтрий всички записи</button>
     <p class="muted small center">N NAILS Planner ${APP_VERSION} · Подарък от N NAILS с любов</p>
@@ -89,7 +89,7 @@ export function openSettings() {
 }
 
 async function exportBackup() {
-  const ids = state.trips.flatMap((t) => t.photos || []);
+  const ids = [...state.trips.flatMap((t) => t.photos || []), ...state.kitchen.recipes.map((r) => r.photo).filter(Boolean)];
   const photos = await Photos.exportPhotos(ids);
   const data = { app: 'nnails-planner', v: 1, exported: new Date().toISOString(), state, photos };
   const blob = new Blob([JSON.stringify(data)], { type: 'application/json' });
@@ -164,7 +164,7 @@ registerActions({
   wipe: () =>
     confirmSheet({
       title: 'Да изтрия ли всичко?',
-      text: 'Всички ангажименти, цикли, цели, книги, пътувания и списъци ще изчезнат от този телефон. Това не може да се върне.',
+      text: 'Всички ангажименти, цикли, цели, рецепти, менюта, книги, пътувания и списъци ще изчезнат от този телефон. Това не може да се върне.',
       ok: 'Изтрий всичко',
       danger: true,
       onOk: async () => {

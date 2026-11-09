@@ -16,10 +16,23 @@ export function defaults() {
     dreams: [],
     salon: { lastVisit: '', intervalWeeks: 4, dueHidden: '' },
     prefs: { holidays: true, fasts: 'day' },
+    kitchen: kitchenDefaults(),
   };
 }
 
 const isObj = (v) => v && typeof v === 'object' && !Array.isArray(v);
+
+// Моята кухня: рецепти, меню, семейство и покупки — всичко лично.
+export function kitchenDefaults() {
+  return {
+    recipes: [],
+    plan: [],
+    cookDays: {},
+    family: [{ id: 'me', name: 'Аз', portion: 1, eats: true, me: true }],
+    fast: { show: true, oil: false, fish: false, dairy: false, noWeekly: false },
+    shop: { skip: {}, weeks: {} },
+  };
+}
 
 // Слага липсващите полета, без да пипа записаното.
 export function normalize(data) {
@@ -36,6 +49,17 @@ export function normalize(data) {
   if (!Array.isArray(base.cycle.periods)) base.cycle.periods = [];
   if (!isObj(base.cycle.days)) base.cycle.days = {};
   if (!isObj(base.goals)) base.goals = {};
+  const kd = kitchenDefaults();
+  const k = (base.kitchen = isObj(base.kitchen) ? { ...kd, ...base.kitchen } : kd);
+  if (!Array.isArray(k.recipes)) k.recipes = [];
+  if (!Array.isArray(k.plan)) k.plan = [];
+  if (!isObj(k.cookDays)) k.cookDays = {};
+  if (!Array.isArray(k.family) || !k.family.length) k.family = kd.family;
+  if (!k.family.some((m) => m.me)) k.family[0].me = true;
+  k.fast = { ...kd.fast, ...(isObj(k.fast) ? k.fast : {}) };
+  k.shop = { ...kd.shop, ...(isObj(k.shop) ? k.shop : {}) };
+  if (!isObj(k.shop.skip)) k.shop.skip = {};
+  if (!isObj(k.shop.weeks)) k.shop.weeks = {};
   return base;
 }
 

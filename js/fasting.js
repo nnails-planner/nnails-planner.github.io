@@ -188,7 +188,7 @@ function rule(date) {
   }
 
   // сряда и петък през годината
-  if (isWedFri(wd)) return { level: 'fish', why: WEEKLY[wd] };
+  if (isWedFri(wd)) return { level: 'fish', why: WEEKLY[wd], weekly: true };
   return { level: 'free' };
 }
 
@@ -204,7 +204,7 @@ export function fastDay(date) {
     r.zag = zagFor.key === 'xmas' ? 'Коледни заговезни' : 'Богородични заговезни';
     r.why = `${r.zag} — последният блажен ден преди ${zagFor.obj}.`;
   }
-  const out = { date, ...LEVELS[r.level], level: r.level, why: r.why || '', note: r.note || '', period: r.period || '', eve: tomorrow ? `Утре ${tomorrow.verb} ${tomorrow.the}.` : '', zag: r.zag || '' };
+  const out = { date, ...LEVELS[r.level], level: r.level, why: r.why || '', note: r.note || '', period: r.period || '', eve: tomorrow ? `Утре ${tomorrow.verb} ${tomorrow.the}.` : '', zag: r.zag || '', weekly: !!r.weekly };
   if (dayCache.size > 900) dayCache.clear();
   dayCache.set(date, out);
   return out;

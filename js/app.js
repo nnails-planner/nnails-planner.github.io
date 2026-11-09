@@ -6,8 +6,9 @@ import * as Goals from './views/goals.js';
 import * as Corner from './views/corner.js';
 import * as Salon from './views/salon.js';
 import * as Settings from './views/settings.js';
+import * as Kitchen from './views/kitchen.js';
 
-const VIEWS = { cal: Calendar, cycle: Cycle, goals: Goals, corner: Corner, salon: Salon };
+const VIEWS = { cal: Calendar, cycle: Cycle, goals: Goals, kitchen: Kitchen, corner: Corner, salon: Salon };
 const view = document.getElementById('view');
 let lastTab = null;
 

@@ -1,7 +1,7 @@
 // N NAILS Planner — данните за салона и проектите.
 // Тук се сменя всичко, което може да се промени с времето (телефон, линкове, сайт за записване).
 
-export const APP_VERSION = '1.0.6';
+export const APP_VERSION = '1.0.7';
 
 export const SALON = {
   name: 'N NAILS',
