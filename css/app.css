@@ -535,6 +535,25 @@ body[data-tab="cal"] .view { padding-bottom: calc(var(--tabs-h) + var(--safe-b) 
 .toast-btn { margin-left: 10px; color: var(--gold-hi); font-weight: 600; text-decoration: underline; }
 body.sheet-open .toast { bottom: calc(var(--safe-b) + 24px); }
 
+/* ── нова версия: стои, докато не се натисне „Обнови“ ── */
+.update-bar {
+  position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(var(--tabs-h) + var(--safe-b) + 12px); z-index: 90;
+  width: calc(100% - 32px); max-width: 528px; display: flex; align-items: center; gap: 12px;
+  padding: 12px 12px 12px 18px; border-radius: 18px;
+  background: linear-gradient(160deg, #3E2F25, #1E1611); color: #F3E6CC;
+  box-shadow: 0 16px 40px -14px rgba(42, 32, 25, .85);
+  animation: rise .35s var(--ease);
+}
+.update-bar span { display: flex; flex-direction: column; gap: 2px; min-width: 0; flex: 1; }
+.update-bar b { font: italic 400 17px/1.25 var(--display); color: #E6C985; }
+.update-bar small { font-size: 13px; line-height: 1.35; color: #D9CBB0; }
+.update-bar button { flex: none; padding: 11px 18px; border-radius: 999px; background: #E6C985; color: #2A1F17; font: 600 15px/1 var(--body); }
+.update-bar button:disabled { opacity: .7; }
+body.has-update .view { padding-bottom: calc(var(--tabs-h) + var(--safe-b) + 110px); }
+body.has-update[data-tab="cal"] .view { padding-bottom: calc(var(--tabs-h) + var(--safe-b) + 170px); }
+body.has-update .fab { bottom: calc(var(--tabs-h) + var(--safe-b) + 108px); }
+body.has-update:not(.sheet-open) .toast { bottom: calc(var(--tabs-h) + var(--safe-b) + 100px); }
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }
 }

@@ -84,9 +84,23 @@ if ('serviceWorker' in navigator && location.protocol !== 'file:') {
     navigator.serviceWorker
       .register('sw.js')
       .then((reg) => {
+        // Лентата за нова версия стои, докато не се натисне „Обнови“.
         const offerUpdate = (w) => {
-          toast('Има нова версия на планера. <button class="toast-btn" data-act="sw-update">Обнови</button>');
-          registerActions({ 'sw-update': () => w.postMessage('skipWaiting') });
+          registerActions({
+            'sw-update': (btn) => {
+              btn.disabled = true;
+              btn.textContent = 'Обновявам…';
+              w.postMessage('skipWaiting');
+            },
+          });
+          if (document.getElementById('update-bar')) return;
+          const bar = document.createElement('div');
+          bar.id = 'update-bar';
+          bar.className = 'update-bar';
+          bar.setAttribute('role', 'status');
+          bar.innerHTML = '<span><b>Нова версия на планера</b><small>Натисни „Обнови“, за да я видиш.</small></span><button type="button" data-act="sw-update">Обнови</button>';
+          document.body.append(bar);
+          document.body.classList.add('has-update');
         };
         if (reg.waiting && navigator.serviceWorker.controller) offerUpdate(reg.waiting);
         reg.addEventListener('updatefound', () => {
