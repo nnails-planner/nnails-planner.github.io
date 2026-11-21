@@ -5,6 +5,7 @@ import { icon } from '../icons.js';
 import { SALON, PROJECTS } from '../config.js';
 import { openEventEditor, makeIcs } from './calendar.js';
 import { deliverFile } from '../ui.js';
+import * as E from '../events.js';
 
 const bookHref = () => SALON.bookingUrl || `tel:${SALON.phone}`;
 const bookAttrs = () => (SALON.bookingUrl ? 'target="_blank" rel="noopener"' : '');
@@ -12,8 +13,16 @@ const bookAttrs = () => (SALON.bookingUrl ? 'target="_blank" rel="noopener"' : '
 export function salonStatus() {
   const t = D.today();
   const nn = state.events.filter((e) => e.cat === 'nnails');
-  const next = nn.filter((e) => e.date >= t).sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time))[0] || null;
-  const pastVisit = nn.filter((e) => e.date <= t).map((e) => e.date).sort().pop() || '';
+  // повтарящите се часове също се броят — с най-близката им дата
+  const next =
+    nn
+      .map((e) => {
+        const d = E.nextDate(e, t);
+        return d ? E.occurrence(e, d) : null;
+      })
+      .filter(Boolean)
+      .sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time))[0] || null;
+  const pastVisit = nn.map((e) => E.prevDate(e, t)).filter(Boolean).sort().pop() || '';
   const last = [state.salon.lastVisit || '', pastVisit].sort().pop();
   const weeks = Number(state.salon.intervalWeeks) || 4;
   const due = last ? D.addDays(last, weeks * 7) : '';
@@ -33,7 +42,7 @@ function nextCard(s) {
       <p class="caps">Следващият ти час</p>
       <h2>${D.fmtLong(e.date)}${e.time ? `, ${e.time}` : ''}</h2>
       <p class="muted">${esc(e.title)} · ${D.relDays(D.diffDays(D.today(), e.date))}</p>
-      <div class="btn-row"><button class="btn ghost" data-act="edit-event" data-id="${e.id}">${icon('edit')} Промени</button><button class="btn ghost" data-act="event-ics" data-id="${e.id}">${icon('bell')} Напомняне</button></div>
+      <div class="btn-row"><button class="btn ghost" data-act="edit-event" data-id="${e.id}" data-date="${e.date}">${icon('edit')} Промени</button><button class="btn ghost" data-act="event-ics" data-id="${e.id}">${icon('bell')} Напомняне</button></div>
     </section>`;
   }
   return `<section class="card next-appt">

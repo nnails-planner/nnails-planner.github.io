@@ -15,7 +15,7 @@ export function defaults() {
     lists: [],
     dreams: [],
     salon: { lastVisit: '', intervalWeeks: 4, dueHidden: '' },
-    prefs: { holidays: true, fasts: 'day' },
+    prefs: { holidays: true, fasts: 'day', calTarget: '', askPhone: true },
     kitchen: kitchenDefaults(),
   };
 }

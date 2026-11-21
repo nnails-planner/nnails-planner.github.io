@@ -6,6 +6,8 @@ import { icon } from '../icons.js';
 import * as Photos from '../photos.js';
 import { APP_VERSION } from '../config.js';
 import { fastMode } from './fasts.js';
+import * as E from '../events.js';
+import { phoneEvent } from './calendar.js';
 
 let installEvent = null;
 window.addEventListener('beforeinstallprompt', (e) => {
@@ -70,6 +72,15 @@ function settingsBody() {
     </div>
     <button class="btn ghost wide" data-act="install-open">${icon('addsq')} Сложи планера на началния екран</button>
     <section class="set-block">
+      <h3>${icon('cal')} Календарът на телефона</h3>
+      <p class="muted small">„Напомни ми“ добавя ангажимента в календара на телефона заедно с повторенията. Планерът не е свързан с него постоянно — ако промениш нещо, добави ангажимента отново.</p>
+      <div class="field"><span>Добавяй в</span><div class="seg seg-fasts">${[['ics', 'Календара (файл)'], ['google', 'Google Календар']].map(([v, l]) => `<button type="button" class="${calTarget() === v ? 'on' : ''}" data-act="set-caltarget" data-v="${v}">${l}</button>`).join('')}</div>
+        <small class="muted">„Файл“ е за iPhone и Samsung. „Google Календар“ е за повечето телефони с Android.</small></div>
+      <label class="switch"><input type="checkbox" ${state.prefs.askPhone !== false ? 'checked' : ''} data-change="set-askphone"><span></span>След запис питай дали да го добавя и в телефона</label>
+      <button class="btn ghost wide" data-act="cal-export-all">${icon('download')} Всички предстоящи наведнъж (${upcoming().length})</button>
+      <small class="muted">Това е един файл с всичко. iPhone го отваря направо. В Google Календар се внася от компютър: calendar.google.com → Настройки → Импортиране и експортиране.</small>
+    </section>
+    <section class="set-block">
       <h3>Резервно копие</h3>
       <p class="muted small">Записите ти са само на този телефон. Запази копие от време на време — в Файлове, в имейл или в чат със себе си. С него прехвърляш всичко и на нов телефон.</p>
       <div class="btn-col"><button class="btn ghost wide" data-act="backup-export">${icon('download')} Запази копие</button>
@@ -82,6 +93,12 @@ function settingsBody() {
     <button class="btn ghost danger-text wide" data-act="wipe">${icon('trash')} Изтрий всички записи</button>
     <p class="muted small center">N NAILS Planner ${APP_VERSION} · Подарък от N NAILS с любов</p>
   </div>`;
+}
+
+const calTarget = () => state.prefs.calTarget || (isIOS() ? 'ics' : 'google');
+function upcoming() {
+  const t = D.today();
+  return state.events.filter((e) => (E.isRecurring(e) ? !E.endDate(e) || E.endDate(e) >= t : e.date >= t));
 }
 
 export function openSettings() {
@@ -150,6 +167,17 @@ registerActions({
   'set-holidays': (el) => {
     state.prefs.holidays = el.checked;
     commit();
+  },
+  'set-caltarget': (el) => {
+    state.prefs.calTarget = el.dataset.v;
+    el.parentElement.querySelectorAll('button').forEach((b) => b.classList.toggle('on', b === el));
+    commit();
+  },
+  'cal-export-all': async () => {
+    const list = upcoming();
+    if (!list.length) return toast('Нямаш предстоящи ангажименти.');
+    await deliverFile(E.calendarBlob(list.map((e) => phoneEvent(e))), `N-Planner-kalendar-${D.today()}.ics`, { share: false });
+    toast(isIOS() ? 'Отвори файла и натисни „Добави всички“.' : 'Файлът е готов. Отвори го с календара или го внеси в Google Календар от компютър.');
   },
   'set-fasts': (el) => {
     state.prefs.fasts = el.dataset.v;
